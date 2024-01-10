@@ -1,0 +1,48 @@
+.product-item {
+  border: 1px solid #ddd;
+  width: 300px;
+  margin-bottom: 20px;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.product-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+}
+
+.product-item h2 {
+  padding: 10px;
+  font-size: 20px;
+  color: green;
+}
+
+
+
+
+
+.region-item {
+  border: 1px solid #ddd;
+  width: 300px;
+  display: inline-block;
+  margin: 0 20px 20px 0;
+}
+
+.region-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+}
+
+.region-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.region-name p {
+  color: green;
+}
