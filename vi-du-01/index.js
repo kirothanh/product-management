@@ -1,4 +1,13 @@
 const express = require('express')
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://127.0.0.1:27017/products-test-28t');
+
+const Product = mongoose.model('Product', { 
+  title: String,
+  price: Number, 
+  thumbnail: String
+});
+
 const app = express()
 const port = 3000
 
@@ -9,25 +18,30 @@ app.use(express.static('public'))
 
 app.get('/', (req, res) => {
   res.render("index.pug", {
-    title: "Trang chu",
+    titlePage: "Trang chu",
     message: "Xin chao cac ban"
   })
 })
 
-app.get('/products', (req, res) => {
-  res.send("<h1>Trang danh sach san pham</h1>")
+app.get('/products', async (req, res) => {
+  const products = await Product.find({});
+  console.log(products);
+  res.render("products.pug", {
+    titlePage: "Danh sách sản phẩm",
+    products: products
+  })
 })
 
 app.get('/blog', (req, res) => {
   res.render("blog.pug", {
-    title: "Trang liên hệ",
+    titlePage: "Trang liên hệ",
     message: "Xin chao cac ban"
   })
 })
 
 app.get('/contact', (req, res) => {
   res.render("contact.pug", {
-    title: "Trang liên hệ",
+    titlePage: "Trang liên hệ",
     message: "Xin chao cac ban"
   })
 })
