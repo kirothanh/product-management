@@ -82,23 +82,30 @@ module.exports.changeMulti = async (req, res) => {
       await Product.updateMany(
         { _id: { $in: ids } }, 
         { 
-        deleted: true,
-        deletedAt: new Date()
+          deleted: true,
+          deletedAt: new Date()
         }
       );
-      req.flash('success', `Đổi vị trí thành công ${ids.length} sản phẩm !`);
+      req.flash('success', `Đã xóa thành công ${ids.length} sản phẩm !`);
       break;
     case "change-position":
       for (const item of ids) {
         let [id, position] = item.split("-");
         position = parseInt(position);
-
-        // console.log(id);
-        // console.log(position);
         
-        await Product.updateOne({ _id: id }, { position: position });
+        // console.log('id',id);
+        // console.log('position',position);
+        
+        try {
+          await Product.updateOne({ _id: id.trim() }, { 
+            position: position 
+          });
+        } catch (error) {
+          console.log(error);
+        }
+        
+        req.flash('success', `Đã đổi vị trí thành công ${ids.length} sản phẩm !`);
       }
-      req.flash('success', `Đã xóa thành công ${ids.length} sản phẩm !`);
       break;
     default:
       break;
