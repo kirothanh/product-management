@@ -25,7 +25,7 @@ app.use(methodOverride('_method'))
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // Su dung thang pug
-app.set('views', './views');
+app.set('views', `${__dirname}/views`);
 app.set('view engine', 'pug');
 
 // Flash
@@ -38,7 +38,7 @@ app.use(flash());
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
 
 // Nhung file tinh
-app.use(express.static("public"));
+app.use(express.static(`${__dirname}/public`));
 
 // Routes
 routeAdmin(app);
