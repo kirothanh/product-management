@@ -11,19 +11,19 @@ module.exports.index = async (req, res) => {
 
   // Đoạn bộ lọc
   const filterStatus = filterStatusHelper(req.query);
- 
+
   let find = {
     deleted: false,
   }
 
-  if(req.query.status) {
+  if (req.query.status) {
     find.status = req.query.status;
   }
 
   // Tim kiem
   const objectSearch = searchHelper(req.query);
 
-  if(objectSearch.regex) {
+  if (objectSearch.regex) {
     find.title = objectSearch.regex;
   }
 
@@ -32,8 +32,8 @@ module.exports.index = async (req, res) => {
 
   let objectPagination = paginationHelper(
     {
-    currentPage: 1,
-    limitItems: 4
+      currentPage: 1,
+      limitItems: 4
     },
     req.query,
     countProducts
@@ -43,7 +43,7 @@ module.exports.index = async (req, res) => {
   // Sort
   let sort = {};
 
-  if(req.query.sortKey && req.query.sortValue) {
+  if (req.query.sortKey && req.query.sortValue) {
     sort[req.query.sortKey] = req.query.sortValue
   } else {
     sort.position = "desc";
@@ -92,8 +92,8 @@ module.exports.changeMulti = async (req, res) => {
       break;
     case "delete-all":
       await Product.updateMany(
-        { _id: { $in: ids } }, 
-        { 
+        { _id: { $in: ids } },
+        {
           deleted: true,
           deletedAt: new Date()
         }
@@ -104,18 +104,18 @@ module.exports.changeMulti = async (req, res) => {
       for (const item of ids) {
         let [id, position] = item.split("-");
         position = parseInt(position);
-        
+
         // console.log('id',id);
         // console.log('position',position);
-        
+
         try {
-          await Product.updateOne({ _id: id.trim() }, { 
-            position: position 
+          await Product.updateOne({ _id: id.trim() }, {
+            position: position
           });
         } catch (error) {
           console.log(error);
         }
-        
+
         req.flash('success', `Đã đổi vị trí thành công ${ids.length} sản phẩm !`);
       }
       break;
@@ -154,7 +154,7 @@ module.exports.createPost = async (req, res) => {
   req.body.discountPercentage = parseInt(req.body.discountPercentage);
   req.body.stock = parseInt(req.body.stock);
 
-  if(req.body.position == "") {
+  if (req.body.position == "") {
     const countProducts = await Product.countDocuments();
     req.body.position = countProducts + 1;
   } else {
@@ -174,9 +174,9 @@ module.exports.edit = async (req, res) => {
       deleted: false,
       _id: req.params.id
     };
-  
+
     const product = await Product.findOne(find);
-  
+
     res.render("admin/pages/products/edit.pug", {
       pageTitle: "Chỉnh sửa sản phẩm",
       product: product
@@ -193,7 +193,7 @@ module.exports.editPatch = async (req, res) => {
   req.body.stock = parseInt(req.body.stock);
   req.body.position = parseInt(req.body.position);
 
-  if(req.file) {
+  if (req.file) {
     req.body.thumbnail = `/uploads/${req.file.filename}`;
   }
 
@@ -214,11 +214,11 @@ module.exports.detail = async (req, res) => {
       deleted: false,
       _id: req.params.id
     };
-  
+
     const product = await Product.findOne(find);
 
     console.log(product);
-  
+
     res.render("admin/pages/products/detail.pug", {
       pageTitle: product.title,
       product: product
