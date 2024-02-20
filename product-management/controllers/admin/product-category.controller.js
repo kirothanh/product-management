@@ -2,18 +2,50 @@ const ProductCategory = require("../../models/product-category.model");
 
 const systemConfig = require("../../config/system");
 
+const filterStatusHelper = require("../../helpers/filterStatus");
+const searchHelper = require("../../helpers/search");
+
 // [GET] /admin/products-category
 module.exports.index = async (req, res) => {
+
+  // Bộ lọc
+  const filterStatus = filterStatusHelper(req.query)
+
   let find = {
     deleted: false,
+  }
+
+  if(req.query.status) {
+    find.status = req.query.status;
+  }
+
+  // Tim kiem
+  const objectSearch = searchHelper(req.query)
+
+  if(objectSearch.regex) {
+    find.title = objectSearch.regex
   }
 
   const records = await ProductCategory.find(find);
 
   res.render("admin/pages/products-category/index.pug", {
     pageTitle: "Danh mục sản phẩm",
-    records: records
+    records: records,
+    filterStatus: filterStatus,
+    keyword: objectSearch.keyword
   });
+}
+
+// [PATCH] /admin/products-category/change-status/:status/:id
+module.exports.changeStatus = async (req, res) => {
+  const status = req.params.status;
+  const id = req.params.id;
+
+  await ProductCategory.updateOne({ _id: id}, {status: status});
+
+  req.flash('success', 'Cập nhật trạng thái thành công!');
+
+  res.redirect("back");
 }
 
 // [GET] /admin/products-category/create
