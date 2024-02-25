@@ -199,7 +199,7 @@ module.exports.editPatch = async (req, res) => {
 
   try {
     await Product.updateOne({ _id: req.params.id }, req.body);
-    req.flash('success', `Cập nhật sản phẩm !`);
+    req.flash('success', `Cập nhật sản phẩm thành công !`);
   } catch (error) {
     req.flash('error', `Cập nhật thất bại!`);
   }
