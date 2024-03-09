@@ -3,6 +3,7 @@ const ProductCategory = require("../../models/product-category.model")
 
 const productsHelper = require("../../helpers/product");
 const productsCategoryHelper = require("../../helpers/products-category");
+const productHelper = require("../../helpers/product");
 
 
 // [GET] /products
@@ -20,16 +21,28 @@ module.exports.index = async (req, res) => {
   });
 }
 
-// [GET] /products/:slug
+// [GET] /products/:slugProduct
 module.exports.detail = async (req, res) => {
   try {
     const find = {
       deleted: false,
-      slug: req.params.slug,
+      slug: req.params.slugProduct,
       status: "active"
     };
 
     const product = await Product.findOne(find);
+
+    if(product.product_category_id) {
+      const category = await ProductCategory.findOne({
+        _id: product.product_category_id,
+        status: "active",
+        deleted: false
+      })
+
+      product.category = category;
+    }
+
+    product.priceNew = productHelper.priceNewProduct(product);
 
     console.log(product);
 
@@ -38,6 +51,7 @@ module.exports.detail = async (req, res) => {
       product: product
     });
   } catch (error) {
+    console.log(error);
     res.redirect(`/products`);
   }
 }
