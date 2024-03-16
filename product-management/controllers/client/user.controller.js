@@ -1,8 +1,10 @@
 const md5 = require("md5");
 const User = require("../../models/user.model");
 const ForgotPassword = require("../../models/forgot-password.model");
+const Cart = require("../../models/cart.model");
 
 const generateHelper = require("../../helpers/generate");
+const sendMailHelper = require("../../helpers/sendMail");
 
 // [GET] /user/register
 module.exports.register = async (req, res) => {
@@ -71,6 +73,13 @@ module.exports.loginPost = async (req, res) => {
 
   res.cookie("tokenUser", user.tokenUser)
 
+  // Lưu user_id vào collection carts
+  await Cart.updateOne({
+    _id: req.cookies.cartId
+  }, {
+    user_id: user.id
+  })
+
   res.redirect("/")
 }
 
@@ -115,7 +124,13 @@ module.exports.forgotPasswordPost = async (req, res) => {
   await forgotPassword.save();
 
   // Việc 2: Gửi mã OTP qua email của user
+  const subject = "Mã OTP xác minh lấy lại mật khẩu";
+  const html = `
+    Mã OTP xác minh lấy lại mật khẩu là <b>${otp}</b>. Thời hạn sử dụng là 3 phút. Lưu ý không được để lộ mã OTP
+  `
 
+  sendMailHelper.sendMail(email, subject, html)
+  
   res.redirect(`/user/password/otp?email=${email}`)
 }
 
@@ -152,5 +167,35 @@ module.exports.otpPasswordPost = async (req, res) => {
   res.cookie("tokenUser", user.tokenUser)
 
   res.redirect("/user/password/reset")
+}
+
+// [GET] /user/password/reset
+module.exports.resetPassword = async (req, res) => {
+  res.render("client/pages/user/reset-password.pug", {
+    pageTitle: "Đổi mật khẩu",
+  });
+}
+
+// [POST] /user/password/reset
+module.exports.resetPasswordPost = async (req, res) => {
+  const password = req.body.password;
+  const tokenUser = req.cookies.tokenUser;
+
+  await User.updateOne({
+    tokenUser: tokenUser
+  }, {
+    password: md5(password)
+  })
+
+  req.flash("success", "Đổi mật khẩu thành công.")
+
+  res.redirect("/")
+}
+
+// [GET] /user/info
+module.exports.info = async (req, res) => {
+  res.render("client/pages/user/info.pug", {
+    pageTitle: "Thông tin tài khoản",
+  });
 }
 
