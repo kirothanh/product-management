@@ -6,7 +6,9 @@ const flash = require('express-flash');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const moment = require('moment');
-const multer  = require('multer');
+const multer = require('multer');
+const http = require('http');
+const { Server } = require("socket.io");
 require('dotenv').config();
 
 const database = require("./config/database.js")
@@ -30,9 +32,14 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.set('views', `${__dirname}/views`);
 app.set('view engine', 'pug');
 
+// SocketIO
+const server = http.createServer(app);
+const io = new Server(server);
+global._io = io;
+
 // Flash
 app.use(cookieParser('HELLOMOTHER'));
-app.use(session({ cookie: { maxAge: 60000 }}));
+app.use(session({ cookie: { maxAge: 60000 } }));
 app.use(flash());
 // End Flash
 
@@ -57,6 +64,6 @@ app.get("*", (req, res) => {
   })
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 })
