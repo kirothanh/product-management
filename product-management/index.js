@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const moment = require('moment');
 const multer  = require('multer');
+const http = require('http');
+const { Server } = require("socket.io");
 require('dotenv').config();
 
 const database = require("./config/database.js")
@@ -29,6 +31,14 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // Su dung thang pug
 app.set('views', `${__dirname}/views`);
 app.set('view engine', 'pug');
+
+// SocketIO
+const server = http.createServer(app);
+const io = new Server(server);
+
+io.on('connection', (socket) => {
+  console.log('a user connected', socket.id);
+});
 
 // Flash
 app.use(cookieParser('HELLOMOTHER'));
@@ -57,6 +67,6 @@ app.get("*", (req, res) => {
   })
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 })
