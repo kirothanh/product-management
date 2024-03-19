@@ -1,13 +1,24 @@
 import * as Popper from 'https://cdn.jsdelivr.net/npm/@popperjs/core@^2/dist/esm/index.js'
 
+// FileUploadWithPreview
+const upload = new FileUploadWithPreview.FileUploadWithPreview('upload-image', {
+  multiple: true,
+  maxFileCount: 6
+});
+// End FileUploadWithPreview
+
 // CLIENT_SEND_MESSAGE
 const formSendData = document.querySelector(".chat .inner-form");
 if (formSendData) {
   formSendData.addEventListener("submit", (e) => {
     e.preventDefault();
     const content = e.target.elements.content.value;
+    const images = upload.cachedFileArray || [];
 
-    if (content) {
+    if (content || images.length > 0) {
+      // Gui content hoac anh len server
+      console.log(images);
+
       socket.emit("CLIENT_SEND_MESSAGE", content);
       e.target.elements.content.value = "";
       socket.emit("CLIENT_SEND_TYPING", "hidden")
@@ -77,8 +88,6 @@ if (buttonIcon) {
 }
 
 // Insert Icon To Input
-
-
 const emojiPicker = document.querySelector("emoji-picker");
 if (emojiPicker) {
   const inputChat = document.querySelector(".chat .inner-form input[name='content']");
@@ -90,7 +99,7 @@ if (emojiPicker) {
     const end = inputChat.value.length;
     inputChat.setSelectionRange(end, end)
     inputChat.focus();
-    
+
     showTyping()
   })
 
@@ -132,9 +141,7 @@ if (elementListTyping) {
         elementListTyping.removeChild(boxTypingRemove)
       }
     }
-
   })
 }
-
-
 // End SERVER_RETURN_TYPING
+
