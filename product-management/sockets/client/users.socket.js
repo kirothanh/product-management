@@ -49,6 +49,16 @@ module.exports = async (res) => {
         lengthAcceptFriends: lengthAcceptFriends
       });
 
+      // Lấy thông tin của A trả về cho B
+      const infoUserA = await User.findOne({
+        _id: myUserId
+      }).select("id fullName avatar")
+
+      socket.broadcast.emit("SERVER_RETURN_INFO_ACCEPT_FRIEND", {
+        userId: userId,
+        infoUserA: infoUserA
+      });
+
     })
 
 
