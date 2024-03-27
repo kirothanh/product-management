@@ -2,42 +2,50 @@ const Chat = require("../../models/chat.model");
 
 const uploadToCloudinary = require("../../helpers/uploadToCloudinary")
 
-module.exports = async (res) => {
+module.exports = async (req, res) => {
   const userId = res.locals.user.id;
   const fullName = res.locals.user.fullName;
+  const roomChatId = req.params.roomChatId;
 
   _io.once('connection', (socket) => {
-    socket.on("CLIENT_SEND_MESSAGE", async (data) => {
-      let images = [];
+    try {
+      socket.join(roomChatId);
 
-      for (const imageBuffer of data.images) {
-        const link = await uploadToCloudinary(imageBuffer);
-        images.push(link)
-      }
+      socket.on("CLIENT_SEND_MESSAGE", async (data) => {
+        let images = [];
 
-      // Luu vao database
-      const chat = new Chat({
-        user_id: userId,
-        content: data.content,
-        images: images
-      });
-      await chat.save();
+        for (const imageBuffer of data.images) {
+          const link = await uploadToCloudinary(imageBuffer);
+          images.push(link)
+        }
 
-      // Tra data ve client
-      _io.emit("SERVER_RETURN_MESSAGE", {
-        userId: userId,
-        fullName: fullName,
-        content: data.content,
-        images: images
+        // Luu vao database
+        const chat = new Chat({
+          user_id: userId,
+          room_chat_id: roomChatId,
+          content: data.content,
+          images: images
+        });
+        await chat.save();
+
+        // Tra data ve client
+        _io.to(roomChatId).emit("SERVER_RETURN_MESSAGE", {
+          userId: userId,
+          fullName: fullName,
+          content: data.content,
+          images: images
+        })
       })
-    })
 
-    socket.on("CLIENT_SEND_TYPING", (type) => {
-      socket.broadcast.emit("SERVER_RETURN_TYPING", {
-        userId: userId,
-        fullName: fullName,
-        type: type
+      socket.on("CLIENT_SEND_TYPING", (type) => {
+        socket.broadcast.to(roomChatId).emit("SERVER_RETURN_TYPING", {
+          userId: userId,
+          fullName: fullName,
+          type: type
+        })
       })
-    })
+    } catch (error) {
+      console.log(error);
+    }
   });
 }

@@ -3,27 +3,35 @@ const User = require("../../models/user.model");
 
 const chatSocket = require("../../sockets/client/chat.socket")
 
-// [GET] /chat/
+// [GET] /chat/:roomChatId
 module.exports.index = async (req, res) => {
-  // SocketIO
-  chatSocket(res)
-  // End SocketIO
+  try {
+    const roomChatId = req.params.roomChatId;
+  
+    // SocketIO
+    chatSocket(req, res)
+    // End SocketIO
 
-  // Lay ra data
-  const chats = await Chat.find({
-    deleted: false
-  })
+    // Lay ra data
+    const chats = await Chat.find({
+      room_chat_id: roomChatId,
+      deleted: false
+    })
 
-  for(const chat of chats) {
-    const infoUser = await User.findOne({
-      _id: chat.user_id
-    }).select("fullName");
+    for(const chat of chats) {
+      const infoUser = await User.findOne({
+        _id: chat.user_id
+      }).select("fullName");
 
-    chat.infoUser = infoUser
+      chat.infoUser = infoUser
+    }
+
+    res.render("client/pages/chat/index.pug", {
+      pageTitle: "Chat",
+      chats: chats
+    });
+  } catch (error) {
+    console.log(error);
   }
-
-  res.render("client/pages/chat/index.pug", {
-    pageTitle: "Chat",
-    chats: chats
-  });
+  
 }

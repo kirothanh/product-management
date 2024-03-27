@@ -10,9 +10,9 @@ block main
       .col-12 
         +box-head(pageTitle)
 
-    .row 
+    .row(data-users-friend) 
       each user in users 
-        .col-6 
+        .col-6(user-id=user.id) 
           div(class="box-user")
             div(class="inner-avatar")
               img(
@@ -23,7 +23,7 @@ block main
               div(class="inner-name") #{user.fullName}
               div(class="inner-buttons")
                 a(
-                  href="#"
+                  href=`/chat/${user.roomChatId}`
                   class="btn btn-sm btn-primary mr-1"
                 ) Nhắn tin 
             div(
