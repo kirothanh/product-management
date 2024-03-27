@@ -10,7 +10,7 @@ module.exports.isAccess = async (req, res, next) => {
       "users.user_id": userId,
       deleted: false
     })
-  
+
     if(isAccessRoomChat) {
       next();
     } else {
@@ -19,6 +19,4 @@ module.exports.isAccess = async (req, res, next) => {
   } catch (error) {
     res.redirect("/");
   }
-
-  next();
 }
