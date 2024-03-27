@@ -15,17 +15,18 @@ block main
         ) Tạo phòng chat 
 
     .row  
-      .col-6 
-        div(class="box-room")
-          div(class="inner-avatar")
-            img(
-              src=(user.avatar ? user.avatar : "/images/User-avatar.svg.png")
-              alt="Phòng abc"
-            )
-          div(class="inner-info")
-            div(class="inner-name") Phòng abc 
-            div(class="inner-buttons")
-              a(
-                href="#"
-                class="btn btn-sm btn-primary mr-1"
-              ) Nhắn tin
+      each roomChat in listRoomChat
+        .col-6 
+          div(class="box-room")
+            div(class="inner-avatar")
+              img(
+                src=(user.avatar ? user.avatar : "/images/User-avatar.svg.png")
+                alt= roomChat.title
+              )
+            div(class="inner-info")
+              div(class="inner-name") #{roomChat.title}
+              div(class="inner-buttons")
+                a(
+                  href=`/chat/${roomChat.id}`
+                  class="btn btn-sm btn-primary mr-1"
+                ) Nhắn tin
