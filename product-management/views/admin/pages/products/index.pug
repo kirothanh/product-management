@@ -36,7 +36,7 @@ block main
           .col-8
             if(role.permissions.includes("products_edit")) 
               +form-change-multi(`${prefixAdmin}/products/change-multi?_method=PATCH`)
-          .col-4
+          .col-4.text-right
             if(role.permissions.includes("products_create"))  
               a(
                 href=`${prefixAdmin}/products/create`
@@ -123,7 +123,7 @@ block main
                   if(role.permissions.includes("products_edit")) 
                     a(
                       href=`${prefixAdmin}/products/edit/${item.id}`
-                      class="btn btn-warning btn-sm"
+                      class="btn btn-warning btn-sm ml-1"
                       ) Sửa 
                   if(role.permissions.includes("products_delete")) 
                     button(
