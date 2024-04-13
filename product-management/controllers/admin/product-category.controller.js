@@ -52,6 +52,80 @@ module.exports.changeStatus = async (req, res) => {
   res.redirect("back");
 }
 
+// [PATCH] admin/products-category/change-multi
+module.exports.changeMulti = async (req, res) => {
+  try {
+    const type = req.body.type;
+    const ids = req.body.ids.split(", ");
+    const updatedBy = {
+      account_id: res.locals.user.id,
+      updatedAt: new Date()
+    }
+
+    switch (type) {
+      case "active":
+        await ProductCategory.updateMany(
+          { _id: { $in: ids } },
+          {
+            status: "active",
+            $push: { updatedBy: updatedBy }
+          }
+        )
+        req.flash('success', `Cập nhật trạng thái thành công ${ids.length} danh mục sản phẩm !`);
+        break
+      case "inactive":
+        await ProductCategory.updateMany(
+          { _id: { $in: ids } },
+          {
+            status: "inactive",
+            $push: { updatedBy: updatedBy }
+          }
+        )
+        req.flash('success', `Cập nhật trạng thái thành công ${ids.length} danh mục sản phẩm !`);
+        break
+      case "delete-all":
+        await ProductCategory.updateMany(
+          { _id: { $in: ids } },
+          {
+            deleted: true,
+            deletedBy: {
+              account_id: res.locals.user.id,
+              deletedAt: new Date()
+            }
+          }
+        );
+        req.flash('success', `Đã xóa thành công ${ids.length} danh mục sản phẩm !`);
+        break;
+      case "change-position":
+        for (const item of ids) {
+          let [id, position] = item.split("-");
+          position = parseInt(position);
+
+          // console.log('id',id);
+          // console.log('position',position);
+
+          try {
+            await ProductCategory.updateOne({ _id: id.trim() }, {
+              position: position,
+              $push: { updatedBy: updatedBy }
+            });
+          } catch (error) {
+            console.log(error);
+          }
+
+          req.flash('success', `Đã đổi vị trí thành công ${ids.length} danh mục sản phẩm !`);
+        }
+        break;
+      default:
+        break;
+    }
+
+    res.redirect("back")
+  } catch (error) {
+    console.log("ERROR: " + error);
+  }
+}
+
 // [GET] /admin/products-category/create
 module.exports.create = async (req, res) => {
   let find = {

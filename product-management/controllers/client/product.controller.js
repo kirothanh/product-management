@@ -8,17 +8,21 @@ const productHelper = require("../../helpers/product");
 
 // [GET] /products
 module.exports.index = async (req, res) => {
-  const products = await Product.find({
-    status: "active",
-    deleted: false
-  }).sort({ position: "desc" });
-
-  const newProducts = productsHelper.priceNewProducts(products);
-
-  res.render("client/pages/products/index.pug", {
-    pageTitle: "Danh sách sản phẩm",
-    products: newProducts
-  });
+  try {
+    const products = await Product.find({
+      status: "active",
+      deleted: false
+    }).sort({ position: "desc" });
+  
+    const newProducts = productsHelper.priceNewProducts(products);
+  
+    res.render("client/pages/products/index.pug", {
+      pageTitle: "Danh sách sản phẩm",
+      products: newProducts
+    });
+  } catch (error) {
+    console.log("Lỗi: " + error);
+  }
 }
 
 // [GET] /products/:slugProduct
